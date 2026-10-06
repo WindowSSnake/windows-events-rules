@@ -1,0 +1,1289 @@
+{
+  "_version": "1.0.0",
+  "_updated": "2026-10-06",
+  "_license": "CC BY-SA 4.0",
+  "_author": "WindowSSnake",
+  "_description": "Windows 事件规则库：中文描述 + 严重度分级 + 排查建议。",
+  "_events_count": 142,
+  "_calibration_note": "",
+  "events": [
+    {
+      "source": "Microsoft-Windows-WHEA-Logger",
+      "event_id": 1,
+      "level": "Error",
+      "severity": "High",
+      "title": "硬件错误（不可纠正）",
+      "description": "WHEA 记录到一个不可纠正的硬件错误。通道：System。不可纠正错误通常导致系统崩溃或数据丢失，是硬件劣化或供电/散热异常的典型信号。关注 ErrorSource、ErrorType、ErrorStatus、Severity 字段。",
+      "suggestion": "1. 运行 mdsched.exe 进行内存诊断。2. 检查 CPU/GPU 散热，清理灰尘，确认风扇转速。3. 更新 BIOS 和芯片组驱动。4. 若频繁出现，备份数据并逐一排查内存、硬盘、电源。5. 结合 ErrorSource 定位具体硬件。"
+    },
+    {
+      "source": "Microsoft-Windows-Bits-Client",
+      "event_id": 3,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "BITS 传输失败",
+      "description": "后台智能传输服务（BITS）作业失败。常见于 Windows 更新或应用商店下载。",
+      "suggestion": "检查网络，重启 BITS 服务（net stop bits / net start bits）。"
+    },
+    {
+      "source": "disk",
+      "event_id": 7,
+      "level": "Error",
+      "severity": "High",
+      "title": "磁盘存在坏块",
+      "description": "系统在磁盘上检测到坏块。通道：System。官方说明：设备存在 Windows 尝试读取的坏块，数据可能丢失或损坏；如果此事件定期记录，建议更换硬盘。",
+      "suggestion": "1. 立即备份重要数据。2. 运行 chkdsk /r 扫描并尝试修复。3. 使用 CrystalDiskInfo 检查 SMART 状态。4. 若坏块数量持续增加，立即更换硬盘。"
+    },
+    {
+      "source": "Volsnap",
+      "event_id": 7,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "卷影副本删除（空间不足）",
+      "description": "卷影副本因空间不足被删除。系统还原点或备份快照被删除。",
+      "suggestion": "增加系统保护占用的磁盘空间，或清理其他文件释放空间。"
+    },
+    {
+      "source": "disk",
+      "event_id": 11,
+      "level": "Error",
+      "severity": "High",
+      "title": "磁盘控制器错误",
+      "description": "驱动程序在设备上检测到控制器错误。通道：System。可能是数据线、电源线接触不良，也可能是硬盘或控制器硬件故障。",
+      "suggestion": "1. 检查 SATA/SAS 数据线和电源线是否连接牢固。2. 更换数据线或换一个主板接口测试。3. 更新存储控制器驱动。4. 若持续出现，备份数据并考虑更换硬件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Mitigations",
+      "event_id": 11,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "缓解措施拦截了代码执行",
+      "description": "Windows 安全缓解策略拦截了一次可疑的代码执行。可能是漏洞利用被拦截，也可能是某些程序（如旧版游戏、加壳软件）被误伤。",
+      "suggestion": "查看事件中的程序路径。若为合法程序，可在\"Exploit Protection\"中为该程序单独放宽策略。"
+    },
+    {
+      "source": "Microsoft-Windows-WindowsUpdateClient",
+      "event_id": 16,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "Windows 更新失败",
+      "description": "Windows 更新客户端遇到错误。通道：System。具体错误码在事件详情中，需结合错误码排查。",
+      "suggestion": "1. 查看事件详情中的错误码。2. 重启系统。3. 运行 Windows 更新疑难解答。4. 运行 DISM 和 sfc 修复系统文件。5. 清空更新缓存后重试。"
+    },
+    {
+      "source": "Microsoft-Windows-WHEA-Logger",
+      "event_id": 17,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "已纠正的硬件错误（PCIe 错误）",
+      "description": "WHEA 记录到一个已纠正的硬件错误，通常为 PCIe 链路错误。通道：System。已纠正错误通常不立即致命，但频繁出现是硬件劣化的前兆。",
+      "suggestion": "1. 记录出现频率，若短时间内集中出现，立即备份数据。2. 运行 mdsched.exe 检查内存。3. 更新 BIOS、芯片组驱动和存储驱动。4. 检查散热和电源。5. 若伴随 18/19 出现，按高优先级处理。"
+    },
+    {
+      "source": "Microsoft-Windows-WHEA-Logger",
+      "event_id": 18,
+      "level": "Error",
+      "severity": "High",
+      "title": "致命硬件错误（不可纠正）",
+      "description": "WHEA 记录到一个致命硬件错误（A fatal hardware error has occurred）。通道：System。错误源通常为 Machine Check Exception，报告组件为处理器核心。这是不可纠正的硬件错误，通常导致系统蓝屏（WHEA_UNCORRECTABLE_ERROR，Bugcheck 0x124）或数据丢失，是 CPU、内存或主板硬件故障的强烈信号。[reference:1]",
+      "suggestion": "1. 立即备份重要数据。2. 运行 mdsched.exe 完整内存测试。3. 关闭 CPU 超频（包括 XMP/EXPO）并恢复默认频率测试。4. 更新 BIOS 到最新版本。5. 检查 CPU 散热和供电（VRM 温度、电源功率）。6. 若持续出现，逐一替换内存条和 CPU 定位故障。"
+    },
+    {
+      "source": "Microsoft-Windows-WHEA-Logger",
+      "event_id": 19,
+      "level": "Warning",
+      "severity": "High",
+      "title": "已纠正的硬件错误（处理器核心）",
+      "description": "WHEA 记录到一个已纠正的硬件错误（A corrected hardware error has occurred）。通道：System。错误源通常为 Corrected Machine Check，报告组件为处理器核心。常见错误类型包括内部奇偶校验错误（Internal parity error）和缓存层级错误（Cache Hierarchy Error）。若频繁出现，强烈提示 CPU 或内存存在实质性问题。",
+      "suggestion": "1. 记录出现频率，若短时间内集中出现，立即备份数据。2. 运行 mdsched.exe 完整内存测试。3. 关闭 CPU 超频和 XMP/EXPO，恢复默认设置测试。4. 更新 BIOS 到最新版本。5. 检查 CPU 散热和供电。6. 若持续出现，逐一替换内存条定位故障。"
+    },
+    {
+      "source": "Microsoft-Windows-WHEA-Logger",
+      "event_id": 20,
+      "level": "Error",
+      "severity": "High",
+      "title": "硬件错误",
+      "description": "WHEA 记录到一个硬件错误。通道：System。WHEA-Logger 的常见错误事件之一，需结合错误记录分析具体硬件来源。",
+      "suggestion": "1. 查看事件详细信息中的错误记录。2. 运行内存诊断和硬盘健康检查。3. 更新 BIOS 和芯片组驱动。4. 若频繁出现，备份数据并逐项排查硬件。"
+    },
+    {
+      "source": "Microsoft-Windows-Kernel-Boot",
+      "event_id": 20,
+      "level": "Error",
+      "severity": "High",
+      "title": "启动配置数据错误",
+      "description": "启动配置数据中有错误。通道：System。BCD 损坏可能导致系统无法正常启动。",
+      "suggestion": "1. 使用 bcdedit 检查 BCD 配置。2. 从恢复环境运行 bootrec /rebuildbcd。3. 若无法启动，使用安装介质修复启动。4. 检查硬盘健康状态。"
+    },
+    {
+      "source": "Microsoft-Windows-WindowsUpdateClient",
+      "event_id": 20,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "Windows 更新安装失败",
+      "description": "Windows 更新客户端安装更新时失败。通道：System。常见错误码 0x800F0820 表示有挂起操作或依赖未满足。",
+      "suggestion": "1. 先重启系统。2. 设置 → Windows 更新 → 检查更新。3. 如仍失败，运行 DISM /Online /Cleanup-Image /RestoreHealth 和 sfc /scannow。4. 清空 C:\\Windows\\SoftwareDistribution 后重试。5. 手动到 Microsoft Update Catalog 下载对应 KB 安装。"
+    },
+    {
+      "source": "Microsoft-Windows-WindowsUpdateClient",
+      "event_id": 25,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "Windows 更新失败",
+      "description": "Windows 更新客户端下载或安装更新时失败。通道：System。可能为网络问题、磁盘空间不足或更新组件损坏。",
+      "suggestion": "1. 检查网络连接。2. 确认系统盘有足够空间。3. 运行 Windows 更新疑难解答。4. 重启后重新检查更新。5. 若持续失败，手动下载 KB 安装。"
+    },
+    {
+      "source": "Microsoft-Windows-Kernel-Processor-Power",
+      "event_id": 35,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "处理器电源管理问题",
+      "description": "处理器性能电源管理功能因固件问题被禁用。通道：System。通常与 BIOS 固件或电源管理设置有关。",
+      "suggestion": "1. 更新主板 BIOS 到最新版本。2. 在 BIOS 中启用 Intel SpeedStep 或 AMD Cool'n'Quiet。3. 恢复 BIOS 默认设置。4. 更新芯片组驱动。"
+    },
+    {
+      "source": "Microsoft-Windows-Time-Service",
+      "event_id": 36,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "时间同步失败",
+      "description": "时间服务无法同步系统时间。通道：System。可能为网络连接问题或 NTP 服务器不可达。",
+      "suggestion": "1. 检查网络连接和 NTP 服务器可达性。2. 运行 w32tm /resync 手动同步。3. 检查防火墙是否阻止 NTP 端口（UDP 123）。4. 确认时间服务正在运行。"
+    },
+    {
+      "source": "Microsoft-Windows-Kernel-Power",
+      "event_id": 41,
+      "level": "Critical",
+      "severity": "High",
+      "title": "系统未正常关机即重启",
+      "description": "系统已重启，但先前未正常关机。通道：System。官方级别：Critical。可能由系统停止响应、崩溃或意外断电引起。判别逻辑：BugcheckCode 非 0 表示蓝屏，需分析 dump；BugcheckCode 为 0 且 PowerButtonTimestamp 为 0 表示系统在未记录任何信息的情况下失去响应，可能为电源故障、过热或硬件锁死；PowerButtonTimestamp 非 0 表示用户长按电源键强制关机。[reference:3]",
+      "suggestion": "1. 查看 BugcheckCode 是否为 0。2. 非 0 表示蓝屏，分析 dump 文件。3. BugcheckCode 和 PowerButtonTimestamp 均为 0 时，检查电源供电、散热和硬件连接。4. PowerButtonTimestamp 非 0 表示强制关机，检查是否存在系统无响应。5. 检查最近硬件变更和驱动更新。"
+    },
+    {
+      "source": "Microsoft-Windows-WHEA-Logger",
+      "event_id": 47,
+      "level": "Warning",
+      "severity": "High",
+      "title": "已纠正的内存错误",
+      "description": "WHEA 记录到一个已纠正的内存错误。通道：System。通常由内存控制器纠正，提示内存条可能出现劣化。",
+      "suggestion": "1. 运行 mdsched.exe 进行完整内存诊断。2. 重新插拔内存条，清洁金手指。3. 若有多条内存，逐一测试定位故障条。4. 检查内存频率和时序是否与主板兼容。5. 若频繁出现，考虑更换内存条。"
+    },
+    {
+      "source": "disk",
+      "event_id": 51,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "磁盘分页操作错误",
+      "description": "在分页操作期间检测到设备错误。通道：System。偶发可忽略（如插入空白光盘），频繁出现需警惕硬盘健康。",
+      "suggestion": "1. 偶尔出现可忽略。2. 频繁出现时运行 chkdsk /r。3. 使用 CrystalDiskInfo 检查 SMART。4. 检查数据线和电源线。5. 备份数据，考虑更换硬盘。"
+    },
+    {
+      "source": "disk",
+      "event_id": 52,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "磁盘IO操作重试",
+      "description": "IO 操作已重试。通道：System。关注频率。频繁重试可能为硬盘即将故障的前兆，或存储子系统性能问题。",
+      "suggestion": "1. 检查硬盘 SMART 状态。2. 检查数据线和电源线。3. 确认没有存储控制器过载。4. 若频繁出现，备份数据并考虑更换硬盘。"
+    },
+    {
+      "source": "Ntfs",
+      "event_id": 55,
+      "level": "Critical",
+      "severity": "High",
+      "title": "文件系统结构损坏",
+      "description": "设备上的文件系统结构已损坏且不可用。通道：System。NTFS 无法写入事务日志，通常由坏扇区或 I/O 错误引起。",
+      "suggestion": "1. 立即运行 chkdsk /f 修复。2. 若修复后仍频繁出现，硬盘可能有物理坏道。3. 使用 CrystalDiskInfo 检查 SMART。4. 备份数据并考虑更换硬盘。"
+    },
+    {
+      "source": "Ntfs",
+      "event_id": 98,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "卷需要离线执行完整Chkdsk",
+      "description": "卷需要离线才能执行完整 Chkdsk。通道：System。提示文件系统可能存在错误，需要安排完整扫描。",
+      "suggestion": "1. 运行 chkdsk /f 修复文件系统错误。2. 若提示需要离线，安排重启后执行。3. 检查硬盘 SMART 状态。4. 备份重要数据。"
+    },
+    {
+      "source": "Microsoft-Windows-Kernel-Power",
+      "event_id": 107,
+      "level": "Information",
+      "severity": "Low",
+      "title": "系统固件已更改处理器性能状态",
+      "description": "系统已从睡眠状态恢复。正常信息。若频繁出现异常唤醒，检查唤醒源。",
+      "suggestion": "正常信息。若频繁出现异常唤醒，检查唤醒源。"
+    },
+    {
+      "source": "Microsoft-Windows-Kernel-Power",
+      "event_id": 109,
+      "level": "Information",
+      "severity": "Low",
+      "title": "内核电源管理器已启动关机转换",
+      "description": "内核电源管理器已启动关机转换。正常信息。用于确认正常关机流程。",
+      "suggestion": "正常信息。用于确认正常关机流程。若与 41 配合分析，可判断是否为正常关机。"
+    },
+    {
+      "source": "storahci",
+      "event_id": 129,
+      "level": "Warning",
+      "severity": "High",
+      "title": "磁盘设备重置指令已发出",
+      "description": "StorAHCI 驱动向设备 \\Device\\RaidPortX 发出了重置指令（Reset to device was issued）。通道：System。当 Storport 检测到 I/O 请求在超时时间内未完成时，会触发重置操作。[reference:4]常见于 AHCI 电源管理问题（LPM），也可能为 SSD 固件或主板 BIOS 兼容性问题。事件中的 \"RaidPort\" 仅为芯片组驱动命名，不代表实际存在 RAID 配置。",
+      "suggestion": "1. 将 AHCI Link Power Management 设置为 Active（在电源选项中将\"AHCI Link Power Management - HIPM/DIPM\"设为 Active）。2. 关闭 PCIe Link State Power Management。3. 更新 SSD 固件和主板 BIOS。4. 更新芯片组驱动。5. 若持续出现，检查硬盘健康状态和数据线连接。"
+    },
+    {
+      "source": "Ntfs",
+      "event_id": 140,
+      "level": "Critical",
+      "severity": "High",
+      "title": "NTFS元数据损坏",
+      "description": "NTFS 元数据已损坏。通道：System。元数据损坏影响文件系统可靠性，通常与坏扇区或磁盘故障相关。",
+      "suggestion": "1. 立即运行 chkdsk /f 修复。2. 检查硬盘 SMART 状态。3. 备份数据。4. 若频繁出现，考虑更换硬盘。"
+    },
+    {
+      "source": "disk",
+      "event_id": 153,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "磁盘IO操作重试",
+      "description": "IO 操作已重试。通道：System。逻辑块地址的操作被重试，提示存储子系统响应异常。",
+      "suggestion": "1. 关注重试频率和趋势。2. 检查硬盘 SMART 状态。3. 更新存储驱动和固件。4. 若持续出现，备份数据并排查硬盘和控制器。"
+    },
+    {
+      "source": "volmgr",
+      "event_id": 161,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "无法创建故障转储",
+      "description": "系统无法创建崩溃转储文件。",
+      "suggestion": "检查 C:\\Windows 下是否有足够的磁盘空间，以及页面文件配置。缺少转储会影响蓝屏问题的诊断。"
+    },
+    {
+      "source": "Microsoft-Windows-TaskScheduler",
+      "event_id": 201,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "计划任务执行完成（含非零退出码）",
+      "description": "计划任务已完成，但返回了非零退出代码。",
+      "suggestion": "任务执行失败但已完成。检查该任务的脚本或程序是否正常。若为第三方任务，联系该软件厂商。"
+    },
+    {
+      "source": "Microsoft-Windows-TaskScheduler",
+      "event_id": 203,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "计划任务启动失败",
+      "description": "计划任务无法启动。",
+      "suggestion": "检查任务的可执行文件路径是否存在、账户权限是否正确。"
+    },
+    {
+      "source": "Microsoft-Windows-Kernel-PnP",
+      "event_id": 219,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "驱动程序加载失败",
+      "description": "驱动程序加载失败。通道：System。设备接入或系统启动时驱动无法正常加载，设备可能无法使用。",
+      "suggestion": "1. 打开设备管理器，检查是否有黄色感叹号。2. 更新或回滚相关驱动。3. 重新插拔设备。4. 若为关键设备驱动，检查系统文件完整性。"
+    },
+    {
+      "source": "Microsoft-Windows-Kernel-PnP",
+      "event_id": 225,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "驱动程序加载超时",
+      "description": "加载驱动程序超时。某个驱动加载缓慢。",
+      "suggestion": "检查设备管理器中的设备状态，更新或回滚相关驱动。"
+    },
+    {
+      "source": "Microsoft-Windows-Storage-Storport",
+      "event_id": 246,
+      "level": "Error",
+      "severity": "High",
+      "title": "磁盘错误",
+      "description": "检测到磁盘错误。通道：System。Storport 驱动报告存储子系统错误，通常与硬盘或控制器有关。",
+      "suggestion": "1. 检查硬盘数据线和电源线。2. 运行 chkdsk。3. 检查硬盘 SMART 状态。4. 更新存储控制器驱动。5. 若持续出现，备份数据并考虑更换硬盘。"
+    },
+    {
+      "source": "Microsoft-Windows-StorageSpaces-Driver",
+      "event_id": 308,
+      "level": "Information",
+      "severity": "Low",
+      "title": "存储空间修复已启动",
+      "description": "存储空间的修复尝试已由驱动程序启动。通道：System。正常修复流程，但频繁出现提示底层磁盘可能有问题。",
+      "suggestion": "1. 正常操作，无需干预。2. 若频繁出现，检查底层物理磁盘健康状态。3. 使用 Get-PhysicalDisk 和 Get-StorageReliabilityCounter 查看磁盘状态。"
+    },
+    {
+      "source": "Microsoft-Windows-StorageSpaces-Driver",
+      "event_id": 312,
+      "level": "Error",
+      "severity": "High",
+      "title": "存储池已降级",
+      "description": "存储池已降级。通道：System。虚拟磁盘无法写入所有副本，容错能力降低，可能随时变为不可用。",
+      "suggestion": "1. 立即使用 Get-PhysicalDisk 检查物理磁盘状态。2. 更换故障磁盘。3. 备份数据。4. 若存储池离线，参考 Microsoft 文档中的 PowerShell 命令恢复。"
+    },
+    {
+      "source": "Microsoft-Windows-StorageSpaces-Driver",
+      "event_id": 315,
+      "level": "Information",
+      "severity": "Low",
+      "title": "虚拟磁盘修复已启动",
+      "description": "虚拟磁盘修复已启动。通道：System。正常修复流程，表示存储空间正在恢复容错。",
+      "suggestion": "1. 正常操作，等待修复完成。2. 若修复时间过长或反复启动，检查底层磁盘健康。"
+    },
+    {
+      "source": "ESENT",
+      "event_id": 508,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "数据库恢复/日志等待",
+      "description": "数据库引擎出现日志或恢复相关警告。常见于 Windows Update 数据库等。若大量出现，检查磁盘 I/O 性能。通常无害。",
+      "suggestion": "常见于 Windows Update 数据库等。若大量出现，检查磁盘 I/O 性能。通常无害。"
+    },
+    {
+      "source": "Microsoft-Windows-Storage-Storport",
+      "event_id": 549,
+      "level": "Error",
+      "severity": "High",
+      "title": "存储适配器错误",
+      "description": "存储适配器报告错误。通道：System。可能为 HBA 驱动或硬件问题。",
+      "suggestion": "1. 更新 HBA/存储控制器驱动。2. 检查线缆连接。3. 检查硬盘 SMART 状态。4. 若为 RAID 环境，检查 RAID 控制器状态。"
+    },
+    {
+      "source": "Application Error",
+      "event_id": 1000,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "应用程序崩溃",
+      "description": "一个应用程序意外终止。查看事件里的 faulting application name 和 faulting module name。常见原因：程序自身 bug、DLL 冲突、内存错误。",
+      "suggestion": "尝试更新或重装该程序，若频繁出现且模块是 ntdll.dll / kernel32.dll，需排查系统或硬件问题。"
+    },
+    {
+      "source": "Microsoft-Windows-WER-SystemErrorReporting",
+      "event_id": 1000,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "Windows 错误报告",
+      "description": "Windows 错误报告已提交。",
+      "suggestion": "查看错误报告详情，关联分析对应的应用崩溃或系统错误。"
+    },
+    {
+      "source": "Microsoft-Windows-WER-SystemErrorReporting",
+      "event_id": 1001,
+      "level": "Error",
+      "severity": "High",
+      "title": "蓝屏错误",
+      "description": "计算机已从错误检查中重新启动。通道：System。Bugcheck 代码和参数包含崩溃原因的关键信息。",
+      "suggestion": "1. 分析 C:\\Windows\\Minidump 或 MEMORY.DMP 文件。2. 关注 BugcheckCode 和四个参数。3. 常见原因：驱动冲突、内存故障、硬件问题。4. 更新驱动和 BIOS。5. 若频繁蓝屏，逐一排查硬件。"
+    },
+    {
+      "source": "Application Hang",
+      "event_id": 1002,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "应用程序无响应",
+      "description": "一个应用程序停止响应。程序可能陷入死循环或等待 I/O。",
+      "suggestion": "查看事件中的程序名。若频繁出现，更新程序版本，检查是否有杀软/防火墙干扰。"
+    },
+    {
+      "source": "Microsoft-Windows-DHCP Client",
+      "event_id": 1002,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "DHCP IP 租约被拒绝",
+      "description": "DHCP 客户端请求的 IP 地址租约被服务器拒绝（The DHCP server sent a DHCPNACK message）。通道：Microsoft-Windows-Dhcp-Client/Admin。与\"联系不到服务器\"不同，此事件表示通信正常但服务器主动拒绝。常见原因：请求的地址与其他设备冲突（微软官方最常见解释）、地址池耗尽、MAC 被加入拒绝筛选器、保留地址冲突。",
+      "suggestion": "1. 首要排查 IP 地址冲突：在 DHCP 服务器/路由器上检查该地址是否被其他设备占用或做了保留。2. 检查地址池使用率是否耗尽。3. 检查拒绝（Deny）筛选器与 MAC 筛选策略。4. 客户端执行 ipconfig /release 后 ipconfig /renew。5. 注意区分：完全无响应/超时通常对应事件 1000/1001，而非本条。"
+    },
+    {
+      "source": "Microsoft-Windows-DNS-Client",
+      "event_id": 1014,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "DNS 解析超时",
+      "description": "DNS 名称解析超时。检查 DNS 服务器可达性。",
+      "suggestion": "可尝试切换到 8.8.8.8 或 223.5.5.5 测试。若频繁出现，检查网络或本机 DNS 缓存。"
+    },
+    {
+      "source": ".NET Runtime",
+      "event_id": 1026,
+      "level": "Error",
+      "severity": "Medium",
+      "title": ".NET 程序未处理异常",
+      "description": ".NET 应用程序出现未处理异常。",
+      "suggestion": "查看异常类型和堆栈。若为第三方程序，联系开发者或更新到最新版。若为系统组件，运行 sfc /scannow 修复系统文件。"
+    },
+    {
+      "source": "Microsoft-Windows-MemoryDiagnostics-Results",
+      "event_id": 1102,
+      "level": "Error",
+      "severity": "High",
+      "title": "内存诊断检测到问题",
+      "description": "Windows 内存诊断工具检测到内存问题。通道：System。内存条可能存在物理故障。",
+      "suggestion": "1. 运行 mdsched.exe 进行完整内存测试。2. 若确认错误，逐一测试内存条定位故障条。3. 清洁金手指，重新插拔。4. 考虑更换内存条。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 1102,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "审计日志已被清除",
+      "description": "Windows 安全审计日志已被清除。通道：Security。正常情况下不应出现此事件，是攻击者掩盖痕迹的强烈信号。Appendix L 标注严重度为 Medium to High。",
+      "suggestion": "1. 立即确认清除操作是否为授权行为。2. 检查 Subject\\Security ID，确认执行清除的账户。3. 关联分析 4719、1100 事件。4. 若为非授权操作，立即隔离主机并启动取证。"
+    },
+    {
+      "source": "Microsoft-Windows-GroupPolicy",
+      "event_id": 1129,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "组策略处理失败",
+      "description": "组策略处理失败。通道：System。域策略可能未正确应用，影响系统配置和安全性。",
+      "suggestion": "1. 运行 gpresult /h report.html 查看详细策略应用情况。2. 检查域控连通性。3. 运行 gpupdate /force 强制刷新。4. 检查 DNS 解析是否正常。"
+    },
+    {
+      "source": "Microsoft-Windows-MemoryDiagnostics-Results",
+      "event_id": 1201,
+      "level": "Warning",
+      "severity": "High",
+      "title": "内存诊断检测到问题",
+      "description": "Windows 内存诊断工具检测到内存问题。通道：System。与 1101 配合分析，确认内存故障。",
+      "suggestion": "1. 运行 mdsched.exe 完整诊断。2. 逐一测试内存条。3. 检查内存频率和时序兼容性。4. 若确认故障，更换内存条。"
+    },
+    {
+      "source": "Microsoft-Windows-User Profiles Service",
+      "event_id": 1511,
+      "level": "Warning",
+      "severity": "High",
+      "title": "使用临时配置文件登录",
+      "description": "Windows 已使用临时配置文件登录。通道：Application。用户配置文件损坏或无法访问，更改将在注销后丢失。",
+      "suggestion": "1. 备份当前用户数据。2. 检查用户配置文件注册表项和文件夹。3. 修复或重建用户配置文件。4. 若为域环境，检查漫游配置文件路径。"
+    },
+    {
+      "source": "Microsoft-Windows-WLAN-AutoConfig",
+      "event_id": 4001,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "WLAN 连接失败",
+      "description": "Wi-Fi 自动配置无法连接到网络。",
+      "suggestion": "检查 Wi-Fi 密码、信号强度、路由器状态。尝试忘记网络后重新连接。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4618,
+      "level": "Information",
+      "severity": "High",
+      "title": "受监视的安全事件模式已触发",
+      "description": "某个预先配置的安全事件模式被匹配。此事件需显式配置审核策略才能触发，一旦出现即表示预定义的安全模式被命中。Appendix L 标注严重度为 High。",
+      "suggestion": "1. 立即检查事件详情中被匹配的具体模式名称。2. 确认触发该模式的事件是否属于预期行为。3. 若为非预期触发，按预定义模式对应的处置流程处理。4. 检查审核策略中配置的全局对象访问审核列表是否需要调整。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4621,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "管理员从 CrashOnAuditFail 恢复系统",
+      "description": "管理员从 CrashOnAuditFail 状态恢复了系统。通道：Security。此前因审核失败导致系统崩溃，恢复期间的部分审核活动可能未被记录。Appendix L 标注严重度为 Medium。官方建议：对此事件的任何发生都应触发警报。[reference:7]",
+      "suggestion": "1. 检查系统是否因审核失败发生过蓝屏或异常重启。2. 检查 CrashOnAuditFail 注册表配置值，确认策略是否符合预期。3. 排查导致审核失败的原因，如磁盘空间不足、日志写入失败或审核策略异常。4. 关联 1100、1101、1102，评估是否发生审核数据丢失。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4624,
+      "level": "Information",
+      "severity": "Low",
+      "title": "账户登录成功",
+      "description": "一个账户已成功登录。官方定义为 \"An account was successfully logged on\"。",
+      "suggestion": "确认登录来源、时间和账户是否符合预期。异常时间、异常来源IP、异常账户的登录需重点排查。若大量成功登录伴随失败登录，可能为爆破成功后的横向移动。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4625,
+      "level": "Information",
+      "severity": "High",
+      "title": "账户登录失败",
+      "description": "一个账户登录失败。此事件在登录尝试发生的计算机上生成，涵盖域控制器、成员服务器和工作站。大量出现可能意味着暴力破解或密码喷洒攻击。",
+      "suggestion": "1. 检查 TargetUserName 和 WorkstationName，确认失败来源。2. 关注 LogonType：类型 3（网络）和 10（RDP）的失败需重点排查。3. 统计短时间失败次数，区分暴力破解与密码喷洒。4. 检查 FailureReason 和 SubStatus 字段。5. 结合 4740 和 4624 判断是否已从失败转为成功。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4627,
+      "level": "Information",
+      "severity": "Low",
+      "title": "组成员身份信息",
+      "description": "登录会话中包含了组成员身份信息。Appendix L 标注严重度为 Low，仅在非预期大量出现时需关注。",
+      "suggestion": "确认账户的组成员身份是否符合预期。非预期的组添加需关联 4728、4732 事件排查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4634,
+      "level": "Information",
+      "severity": "Low",
+      "title": "账户已注销",
+      "description": "一个账户已注销。正常关机、注销会产生。",
+      "suggestion": "关注异常频繁的登录/注销对，可能为脚本或自动化工具反复连接。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4647,
+      "level": "Information",
+      "severity": "Low",
+      "title": "用户主动注销",
+      "description": "用户主动发起了注销。正常操作。",
+      "suggestion": "与 4624 配对分析登录会话时长。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4648,
+      "level": "Information",
+      "severity": "High",
+      "title": "使用显式凭据登录",
+      "description": "一个进程尝试使用显式提供的凭据登录。常见于 Pass-the-Hash 或横向移动场景，攻击者使用备用凭据访问远程系统。",
+      "suggestion": "1. 检查 TargetUserName 和 ProcessName 字段。2. 确认发起进程是否为预期程序（如 runas、计划任务、服务账户）。3. 关注从 lsass.exe 或 cmd.exe 发起的。4. 关联 4624 确认是否成功登录。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4649,
+      "level": "Information",
+      "severity": "High",
+      "title": "检测到重播攻击",
+      "description": "在域控制器上检测到 Kerberos 重播攻击。当服务器收到与最近已处理的票据具有相同服务器名、客户端名、时间和微秒字段的认证请求时触发。Appendix L 标注严重度为 High。",
+      "suggestion": "1. 立即触发告警并调查事件生成原因。2. 检查客户端账户名、工作站名和请求类型。3. 排查客户端与域控制器之间是否存在网络设备配置错误或路由问题导致数据包重复。4. 若非网络配置问题，视为 Kerberos 重播攻击尝试，结合 4625、4771 等事件综合研判。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4657,
+      "level": "Information",
+      "severity": "High",
+      "title": "注册表值已修改",
+      "description": "一个注册表键值已被修改。攻击者通过修改注册表实现持久化或绕过安全机制。",
+      "suggestion": "1. 检查 Object Name、Value Name 和 New Value。2. 关注 Run、RunOnce、Services 等持久化键。3. 关注安全策略相关键修改。4. 关联 4688、4656 确认身份。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4660,
+      "level": "Information",
+      "severity": "High",
+      "title": "对象已被删除",
+      "description": "一个对象（文件、注册表项等）已被删除。攻击者删除关键对象以破坏系统或掩盖痕迹。",
+      "suggestion": "1. 检查 Object Name 和 Process Name。2. 确认删除操作是否预期。3. 非预期删除关联 4663 确认身份。4. 关注敏感文件或注册表项异常删除。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4663,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "尝试访问对象",
+      "description": "已尝试访问一个对象（文件、注册表项等）。默认需配置 SACL 审核才能产生此事件。",
+      "suggestion": "1. 检查 Object Name、Access Type 和 Process Name 字段。2. 确认访问者账户和访问类型是否符合预期。3. 关注对敏感文件、注册表项的访问。4. 关联 4656 和 4658 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4672,
+      "level": "Information",
+      "severity": "Low",
+      "title": "分配了特殊权限",
+      "description": "新登录会话被分配了敏感权限。每次 SYSTEM 账户登录都会触发此事件，因此日志中数量通常非常多。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 关注 Subject\\Security ID 不是 SYSTEM 或已知服务账户的 4672 事件。2. 若非管理员账户出现此事件，排查是否被意外提权或账户已被攻陷。3. 检查 Privileges 字段中是否包含高危特权，如 SeDebugPrivilege、SeTcbPrivilege。4. 将已知合法服务账户的 4672 事件加入白名单。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4673,
+      "level": "Information",
+      "severity": "Low",
+      "title": "调用了特权服务",
+      "description": "一个特权服务被调用。监控对敏感系统服务的异常调用。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Service、Privileges 和 Process Name。2. 关注 SeTcbPrivilege 等高危特权调用。3. 关注非预期进程发起的调用。4. 关联 4672、4674 综合研判。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4674,
+      "level": "Information",
+      "severity": "Low",
+      "title": "尝试对特权对象进行操作",
+      "description": "尝试对已打开的受保护子系统对象执行特权操作。追踪对高价值目标的访问。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Object Name、Process Name 和 Privileges。2. 关注对域管理员账户、敏感注册表项的访问。3. 关注非预期进程发起的操作。4. 关联 4673、4656。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4675,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "SID 已被筛选",
+      "description": "SID 在访问检查时被筛选。域中启用 SID 筛选后，非预期筛选可能表示跨域权限绕过尝试。",
+      "suggestion": "1. 检查 TargetUserName 和 Filtered SID。2. 确认 SID 筛选配置是否符合预期。3. 非预期筛选检查是否被用于跨域提权。4. 关联 4765、4766。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4688,
+      "level": "Information",
+      "severity": "Low",
+      "title": "新进程已创建",
+      "description": "一个新进程已创建。Appendix L 标注严重度为 Low。",
+      "suggestion": "关注异常父进程、异常命令行参数、从临时目录执行的进程。建议开启命令行审计以获取完整参数。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4689,
+      "level": "Information",
+      "severity": "Low",
+      "title": "进程已退出",
+      "description": "一个进程已退出。",
+      "suggestion": "与 4688 配对分析，关注异常退出码。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4692,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "尝试备份数据保护主密钥",
+      "description": "尝试备份数据保护主密钥（DPAPI）。攻击者可能通过备份主密钥解密用户或系统凭据。",
+      "suggestion": "1. 检查 Subject\\Security ID 是否合法。2. 关注非管理员账户发起的备份。3. 关联 4693、4694 综合研判。4. 非预期操作立即调查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4693,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "尝试恢复数据保护主密钥",
+      "description": "尝试从备份恢复数据保护主密钥（DPAPI）。与 4692 对应。",
+      "suggestion": "1. 检查 Subject\\Security ID 是否合法。2. 关注非管理员账户发起的恢复。3. 关联 4692、4694。4. 非预期操作立即调查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4697,
+      "level": "Information",
+      "severity": "Low",
+      "title": "系统中已安装服务",
+      "description": "系统中已安装一个服务。攻击者常通过服务实现持久化。Appendix L 标注严重度为 Low，建议在高价值资产上监控此事件。",
+      "suggestion": "1. 检查 Service Name、Service File Name 和 Service Account 字段。2. 确认服务二进制路径是否位于临时目录或用户目录。3. 确认服务启动账户是否为 SYSTEM 或高权限账户。4. 关联 7045 和 4688 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4698,
+      "level": "Information",
+      "severity": "Low",
+      "title": "计划任务已创建",
+      "description": "一个新的计划任务被创建。攻击者通过计划任务实现持久化，需监控任务内容和触发条件。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Task Name、Task Content 和 Subject\\Security ID 字段。2. 关注任务是否从临时目录或用户目录执行。3. 关注触发条件是否为系统启动、用户登录或高频重复。4. 关联 4697 和 4688 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4703,
+      "level": "Information",
+      "severity": "Low",
+      "title": "令牌权限已调整",
+      "description": "一个令牌的权限已被调整。Appendix L 标注严重度为 Low。[reference:16]",
+      "suggestion": "关注非预期进程发起的令牌权限调整。关联 4672、4673 综合研判。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4704,
+      "level": "Information",
+      "severity": "Low",
+      "title": "用户权限已分配",
+      "description": "一个用户权限已被分配。Appendix L 标注严重度为 Low。",
+      "suggestion": "确认分配的用户权限是否符合最小权限原则。非预期的权限分配需立即调查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4705,
+      "level": "Information",
+      "severity": "Low",
+      "title": "用户权限已移除",
+      "description": "一个用户权限已被移除。Appendix L 标注严重度为 Low。",
+      "suggestion": "确认移除的用户权限是否为授权操作。异常移除可能为攻击者降低防御。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4706,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "已为域创建信任关系",
+      "description": "为域创建了新的信任关系。攻击者可能通过创建信任关系实现跨域访问。Appendix L 标注严重度为 Medium。",
+      "suggestion": "1. 确认信任创建是否为授权行为。2. 检查 Subject\\Security ID 和信任目标域。3. 非预期信任立即调查并评估风险。4. 检查是否有后续跨域访问。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4713,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "Kerberos 策略已更改",
+      "description": "Kerberos 策略已被更改。攻击者可能通过修改策略削弱 Kerberos 安全性。",
+      "suggestion": "1. 检查 Subject\\Security ID。2. 关注与票证有效期、加密类型相关的修改。3. 非预期修改立即恢复原策略。4. 关联 4714、4715、4716。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4714,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "已禁用加密数据恢复策略",
+      "description": "加密数据恢复策略被禁用。可能影响 EFS 加密数据的恢复能力。",
+      "suggestion": "1. 检查 Subject\\Security ID。2. 确认是否为授权操作。3. 非预期变更立即调查并评估 EFS 数据影响。4. 关联 4713、4715、4716。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4715,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "已启用加密数据恢复策略",
+      "description": "加密数据恢复策略被启用。可能是管理员恢复数据，也可能是攻击者配置恢复代理。",
+      "suggestion": "1. 检查 Subject\\Security ID 和恢复代理。2. 确认是否为授权操作。3. 关注非预期恢复代理被添加。4. 关联 4713、4714、4716。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4716,
+      "level": "Information",
+      "severity": "High",
+      "title": "受信任域信息已修改",
+      "description": "受信任域的信息已被修改。通道：Security。仅域控制器生成。攻击者可能通过修改信任关系、信任方向或 SID 筛选实现跨域权限绕过。Appendix L 标注严重度为 Medium。",
+      "suggestion": "1. 检查信任关系名称、信任方向和 SID 筛选设置。2. 检查 Subject\\Security ID，确认执行者身份。3. 非预期修改立即调查并恢复原有信任配置。4. 关联 4706、4765、4766，评估是否伴随跨域提权。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4717,
+      "level": "Information",
+      "severity": "Low",
+      "title": "系统安全访问已授予账户",
+      "description": "系统安全访问权限已被授予一个账户。Appendix L 标注严重度为 Low。",
+      "suggestion": "确认授予的权限是否符合最小权限原则。非预期的授予需关联 4672 排查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4718,
+      "level": "Information",
+      "severity": "Low",
+      "title": "系统安全访问已从账户移除",
+      "description": "系统安全访问权限已从一个账户移除。Appendix L 标注严重度为 Low。",
+      "suggestion": "确认移除操作是否为授权行为。非预期移除可能影响系统功能。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4719,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "系统审计策略已更改",
+      "description": "计算机的审计策略已被更改。此事件始终记录，不受审计策略更改子类别设置影响。攻击者可能试图削弱日志记录能力以掩盖后续恶意行为。Appendix L 标注严重度为 High。",
+      "suggestion": "1. 在高价值资产或计算机上监控所有此类事件。2. 检查 Subject\\Security ID，确认执行更改的账户是否合法。3. 检查 AuditPolicyChanges 字段，确认具体更改内容。4. 若为非计划内的策略变更，立即调查原因并恢复原有审计策略。5. 关联分析 1102 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4720,
+      "level": "Information",
+      "severity": "Low",
+      "title": "用户账户已创建",
+      "description": "一个新用户账户被创建。非预期创建的账户，尤其是被授予管理权限的，是明显的安全红旗。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 New Account\\Security ID 和 Subject\\Security ID。2. 确认创建者是否为授权管理员。3. 确认新账户的命名是否符合组织规范。4. 关联 4732 事件，确认新账户是否被加入管理员组。5. 若为非预期创建，立即禁用该账户并调查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4722,
+      "level": "Information",
+      "severity": "Low",
+      "title": "用户账户已启用",
+      "description": "一个用户账户已被启用。攻击者可能重新启用旧账户用于访问。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Target Account\\Security ID。2. 确认被启用账户是否为长期禁用账户。3. 检查 Subject\\Security ID。4. 非预期启用立即调查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4724,
+      "level": "Information",
+      "severity": "Low",
+      "title": "尝试重置账户密码",
+      "description": "尝试重置一个账户的密码。管理员重置密码为正常操作，需关注非授权尝试。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Target Account\\Security ID 和 Subject\\Security ID。2. 关注非管理员账户发起重置。3. 关注高权限账户被重置。4. 关联 4624 确认后续登录。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4725,
+      "level": "Information",
+      "severity": "Low",
+      "title": "用户账户已禁用",
+      "description": "一个用户账户已禁用。确认禁用操作是否预期。非预期禁用可能为攻击者阻止合法用户访问。Appendix L 标注严重度为 Low。",
+      "suggestion": "确认禁用操作是否预期。非预期禁用可能为攻击者阻止合法用户访问。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4726,
+      "level": "Information",
+      "severity": "Low",
+      "title": "用户账户已删除",
+      "description": "一个用户账户被删除。攻击者删除账户以掩盖痕迹，此事件可用于追溯此类行为。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Target Account\\Security ID 和 Subject\\Security ID。2. 确认删除操作是否为授权行为。3. 若为非预期删除，检查删除前该账户的近期活动。4. 关联 4624、4688 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4727,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "已创建启用安全的全局组",
+      "description": "一个启用安全的全局组被创建。攻击者可能创建特权组用于持久化。Appendix L 标注严重度为 Medium。",
+      "suggestion": "1. 检查 Group\\Group Name 和 Subject\\Security ID。2. 确认创建者是否为授权管理员。3. 关注创建后立即添加成员的行为。4. 关联 4728、4732。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4728,
+      "level": "Information",
+      "severity": "Low",
+      "title": "成员已添加到全局安全组",
+      "description": "一个成员被添加到启用安全的全局组。需跟踪敏感安全组变更，如 Domain Admins、Enterprise Admins。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Member\\Security ID 和 Group\\Group Name 字段。2. 确认被添加的成员是否应属于该全局组。3. 重点关注 Domain Admins、Enterprise Admins、Schema Admins 等特权组。4. 关联 4624、4672 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4732,
+      "level": "Information",
+      "severity": "Low",
+      "title": "成员已添加到本地安全组",
+      "description": "一个新成员已被添加到启用安全性的本地组。特别是添加到管理员组，是常见的提权手法。Appendix L 标注严重度为 Low。",
+      "suggestion": "1. 检查 Group\\Group Name，确认添加目标是否为 Administrators 等高权限组。2. 检查 Member\\Security ID，确认被添加的账户是否为预期账户。3. 检查 Subject\\Security ID，确认执行添加操作的账户是否合法。4. 若为非预期的管理员组成员添加，立即移除该成员并调查添加者账户是否已被攻陷。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4733,
+      "level": "Information",
+      "severity": "Low",
+      "title": "成员已从本地安全组移除",
+      "description": "一个成员已从启用安全的本地组中移除。关注从 Administrators 组移除成员的操作。Appendix L 标注严重度为 Low。",
+      "suggestion": "关注从 Administrators 组移除成员的操作。异常移除可能为攻击者降低防御。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4738,
+      "level": "Information",
+      "severity": "High",
+      "title": "用户账户已更改",
+      "description": "一个用户账户已被更改。监控对账户属性（如 sIDHistory、userAccountControl）的修改。",
+      "suggestion": "1. 检查 Target Account\\Security ID 和 Changed Attributes。2. 关注 userAccountControl 修改。3. 关注 sIDHistory 修改。4. 关联 4720、4732 确认权限提升。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4740,
+      "level": "Information",
+      "severity": "High",
+      "title": "用户账户已被锁定",
+      "description": "一个用户账户已被锁定。可能源于持续的暴力破解，也可能导致拒绝服务，使合法用户无法正常登录。",
+      "suggestion": "1. 检查 Account That Was Locked Out\\Security ID，确认被锁定账户是否为高价值账户。2. 检查 Additional Information\\Caller Computer Name，确认锁定来源是否为域内计算机。3. 若锁定来源不在域内，触发告警。4. 关联 4625 事件，统计锁定前的失败次数和频率。5. 若为高权限账户频繁锁定，考虑是否存在针对性的暴力破解攻击。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4741,
+      "level": "Information",
+      "severity": "Low",
+      "title": "计算机账户已创建",
+      "description": "一个新的计算机账户被创建。Appendix L 标注严重度为 Low。",
+      "suggestion": "确认计算机账户创建是否为授权操作。非预期创建的计算机账户可能被用于域内横向移动。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4742,
+      "level": "Information",
+      "severity": "Low",
+      "title": "计算机账户已更改",
+      "description": "一个计算机账户已被更改。Appendix L 标注严重度为 Low。",
+      "suggestion": "关注计算机账户属性的非预期修改，如 userAccountControl 变更。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4743,
+      "level": "Information",
+      "severity": "Low",
+      "title": "计算机账户已删除",
+      "description": "一个计算机账户已被删除。Appendix L 标注严重度为 Low。",
+      "suggestion": "确认删除操作是否为授权行为。非预期删除可能影响域内服务正常运行。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4756,
+      "level": "Information",
+      "severity": "High",
+      "title": "成员已添加到通用安全组",
+      "description": "一个成员被添加到启用安全的通用组。跟踪敏感通用组的成员变更。",
+      "suggestion": "1. 检查 Member\\Security ID 和 Group\\Group Name。2. 确认成员是否应属于该通用组。3. 重点关注 Enterprise Admins、Schema Admins。4. 关联 4624、4672。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4765,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "SID History 已添加到账户",
+      "description": "一个账户被添加了 SID History 属性。SID History 通常用于域迁移，攻击者也会利用它进行跨域提权或持久化。Appendix L 标注严重度为 High。",
+      "suggestion": "1. 确认是否正在进行合法的域迁移操作。2. 检查 TargetUserName 和 SidHistory 字段。3. 若非迁移场景，视为高危事件，立即调查执行添加的账户和来源。4. 检查该账户是否被用于访问其他域的资源。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4766,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "SID History 添加失败",
+      "description": "尝试向账户添加 SID History 失败。与 4765 对应，同样是高危信号。",
+      "suggestion": "1. 确认是否正在进行合法域迁移。2. 检查 TargetUserName 和 SidHistory。3. 非迁移场景立即调查执行账户。4. 检查该账户是否被用于访问其他域资源。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4768,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "请求了 Kerberos 身份验证票证",
+      "description": "域控制器收到 Kerberos 身份验证票证（TGT）请求。监控异常的 TGT 请求，检测黄金票据攻击。",
+      "suggestion": "1. 检查 TargetUserName、Client Address 和 Ticket Options 字段。2. 关注非工作时间、异常来源 IP、异常加密类型的 TGT 请求。3. 若 Ticket Options 为 0x40810010 且请求来源异常，怀疑黄金票据攻击。4. 关联 4769 和 4771 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4769,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "请求了 Kerberos 服务票证",
+      "description": "域控制器收到 Kerberos 服务票证（TGS）请求。监控异常的服务票证请求，检测白银票据攻击。",
+      "suggestion": "1. 检查 Service Name、TargetUserName 和 Client Address 字段。2. 关注异常的服务名称（如非 SPN 注册的服务）、异常加密类型和异常来源。3. 若 Ticket Encryption Type 为 0x17 且来源异常，怀疑白银票据攻击。4. 关联 4768 和 4771 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4771,
+      "level": "Information",
+      "severity": "High",
+      "title": "Kerberos 预认证失败",
+      "description": "Kerberos 预认证失败。大量出现可能表示对域账户的密码喷洒或暴力破解攻击，也可能由账户密码过期或客户端时间偏差引起。",
+      "suggestion": "1. 检查 Client Address 和 TargetUserName 字段。2. 统计短时间内失败次数，区分暴力破解与密码喷洒。3. 检查 Failure Code 字段，区分密码错误、密码过期、时间偏差。4. 若来源 IP 为异常地址，考虑封锁并进一步调查。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4776,
+      "level": "Information",
+      "severity": "High",
+      "title": "NTLM 身份验证",
+      "description": "域控制器尝试验证账户的 NTLM 凭据。在已淘汰 NTLM 的环境中，任何 NTLM 认证都应关注，尤其是来自遗留系统或非预期主机的请求。",
+      "suggestion": "1. 检查 TargetUserName 和 Workstation 字段。2. 统计 NTLM 认证来源，识别仍在依赖 NTLM 的应用和主机。3. 在已禁用 NTLM 的环境中，非预期 NTLM 认证可能表示回退攻击或配置错误。4. 结合 4624 事件确认认证结果。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4794,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "尝试设置目录服务还原模式",
+      "description": "有人尝试在域控制器上设置目录服务还原模式（DSRM）管理员密码。DSRM 密码可被用于持久化后门，需立即调查。Appendix L 标注严重度为 High。",
+      "suggestion": "1. 确认是否正在进行合法的域控维护操作。2. 检查 Subject\\Security ID，确认执行者身份。3. 若为非授权操作，视为域控被攻陷，立即启动应急响应。4. 检查 DSRM 账户是否被用于登录域控。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4897,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "角色分离已启用",
+      "description": "证书服务角色分离已启用。攻击者可能试图通过角色分离绕过权限控制。",
+      "suggestion": "1. 确认是否为合法 CA 维护。2. 检查 Subject\\Security ID。3. 非预期操作视为 PKI 基础设施被攻击。4. 检查 CA 安全设置是否被修改。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 4964,
+      "level": "Information",
+      "severity": "High",
+      "title": "已向新登录分配特殊组",
+      "description": "新的登录会话中包含了被标记为敏感的特权组。表示登录用户拥有较高的系统权限，需关注是否为预期行为。",
+      "suggestion": "1. 检查 TargetUserName 和 SidList 字段。2. 确认该账户是否确实应属于这些特权组。3. 若非预期，检查该账户是否被意外加入管理员组。4. 关联 4672 和 4624 事件，确认权限来源和登录方式。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 5124,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "OCSP 响应程序安全设置已更新",
+      "description": "OCSP 响应程序服务的安全设置已被更新。可能影响证书吊销检查，攻击者可能借此绕过证书信任验证。",
+      "suggestion": "1. 确认是否为合法 OCSP 维护。2. 检查 Subject\\Security ID。3. 确认已启用 Certification Services 审核。4. 非预期操作立即调查并恢复配置。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 5140,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "网络共享已访问",
+      "description": "一个网络共享对象已被访问。监控横向移动过程中的内部共享访问。",
+      "suggestion": "1. 检查 Share Name、Source Address 和 Subject\\Security ID。2. 关注管理共享（C$、ADMIN$）异常访问。3. 关注非工作时间或异常来源 IP。4. 关联 5145、4624。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 5145,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "详细文件共享访问检查",
+      "description": "已检查网络共享对象以确定是否可授予所需访问权限。记录了对共享对象的具体访问请求和授权结果。",
+      "suggestion": "1. 检查 Share Name、Relative Target Name 和 Subject\\Security ID。2. 确认访问者是否有权限访问该共享。3. 关注对敏感共享的大量文件访问，可能为数据窃取前兆。4. 关联 5140 和 4663 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 5156,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "网络连接已允许",
+      "description": "Windows 筛选平台已允许一个连接。监控异常的出站连接，检测 C2 通信或数据外泄。",
+      "suggestion": "1. 检查 Application Name、Direction 和 Dest Address。2. 关注非预期进程发起的出站连接。3. 关注连接到恶意 IP 或异常端口。4. 关联 5157、4688。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-Auditing",
+      "event_id": 5157,
+      "level": "Information",
+      "severity": "Low",
+      "title": "网络连接已阻止",
+      "description": "Windows 筛选平台已阻止一个连接。防火墙拦截记录。",
+      "suggestion": "若频繁出现，检查是否有程序被反复拦截，或防火墙规则是否过严。"
+    },
+    {
+      "source": "Service Control Manager",
+      "event_id": 7000,
+      "level": "Error",
+      "severity": "High",
+      "title": "服务启动失败",
+      "description": "服务因错误而无法启动。",
+      "suggestion": "检查服务依赖项、可执行文件路径、账户权限。若为关键服务，检查系统文件完整性。"
+    },
+    {
+      "source": "Service Control Manager",
+      "event_id": 7001,
+      "level": "Error",
+      "severity": "High",
+      "title": "服务依赖项启动失败",
+      "description": "服务依赖于另一个服务，但后者启动失败。",
+      "suggestion": "先解决被依赖服务的启动问题。检查依赖链。"
+    },
+    {
+      "source": "Service Control Manager",
+      "event_id": 7031,
+      "level": "Error",
+      "severity": "High",
+      "title": "服务意外终止",
+      "description": "服务意外终止。关注服务名和发生次数。",
+      "suggestion": "检查服务崩溃原因，查看应用程序日志中的相关错误。频繁崩溃可能为服务本身 bug 或依赖的组件问题。"
+    },
+    {
+      "source": "Service Control Manager",
+      "event_id": 7034,
+      "level": "Error",
+      "severity": "High",
+      "title": "服务意外终止",
+      "description": "服务意外终止。与 7031 类似。",
+      "suggestion": "关注服务崩溃的频率和趋势。"
+    },
+    {
+      "source": "Service Control Manager",
+      "event_id": 7040,
+      "level": "Information",
+      "severity": "Low",
+      "title": "服务启动类型已更改",
+      "description": "服务的启动类型已更改。常见于软件安装/卸载、系统更新。",
+      "suggestion": "若非预期变更，排查是否有恶意程序修改了服务配置。"
+    },
+    {
+      "source": "Service Control Manager",
+      "event_id": 7045,
+      "level": "Information",
+      "severity": "Medium",
+      "title": "新服务已安装",
+      "description": "系统中安装了新服务，记录在 System 日志中。与 4697 对应，需关注服务二进制路径和启动账户。",
+      "suggestion": "1. 检查 Service Name、Image Path、Service Type 和 Start Type。2. 确认 Image Path 是否位于临时目录、用户目录或 UNC 路径。3. 确认服务启动账户是否为 SYSTEM 或高权限账户。4. 关联 4697 和 4688 事件。"
+    },
+    {
+      "source": "Microsoft-Windows-WLAN-AutoConfig",
+      "event_id": 8003,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "WLAN 连接已断开",
+      "description": "Wi-Fi 连接已断开。信号弱或漫游时可能出现。",
+      "suggestion": "若频繁断开，检查路由器信道拥挤程度和无线网卡驱动。"
+    },
+    {
+      "source": "Microsoft-Windows-Security-SPP",
+      "event_id": 8198,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "Windows 激活失败",
+      "description": "Windows 激活失败。通道：Application。常见错误码 0xC0020017 或 0x8007139F 表示 KMS 客户端无法联系 KMS 主机。",
+      "suggestion": "1. 检查网络连接和 KMS 服务器可达性。2. 运行 slmgr /dli 查看激活状态。3. 确认 KMS 端口（TCP 1688）未被防火墙阻止。4. 若为批量授权，检查 KMS 主机是否可用。"
+    },
+    {
+      "source": "Microsoft-Windows-DistributedCOM",
+      "event_id": 10005,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "DCOM 服务启动失败",
+      "description": "DCOM 在尝试启动某个服务时收到错误。通常表示依赖 COM 机制的应用程序或服务无法正常初始化。",
+      "suggestion": "1. 确认事件详情中提到的服务名称是否已安装且路径正确。2. 以管理员身份运行\"组件服务\" (dcomcnfg)，检查对应 CLSID 的\"本地激活\"权限。3. 检查相关依赖服务（如 RPC、DCOM Server Process Launcher）是否正在运行。4. 若为第三方组件，尝试重新安装该应用程序。"
+    },
+    {
+      "source": "Microsoft-Windows-DistributedCOM",
+      "event_id": 10010,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "DCOM 服务器未注册",
+      "description": "服务器未在指定时间内向 DCOM 注册。通道：System。依赖 DCOM 的应用程序可能无法正常工作。",
+      "suggestion": "1. 检查对应服务的运行状态。2. 若为第三方组件，更新或重新安装该组件。3. 检查 DCOM 配置权限。4. 重启相关服务。"
+    },
+    {
+      "source": "Microsoft-Windows-DistributedCOM",
+      "event_id": 10016,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "DCOM 组件权限不足",
+      "description": "应用程序尝试访问 DCOM 组件，但当前账户缺少\"本地激活\"权限。这是微软组件常见的日志记录，通常由设计如此。",
+      "suggestion": "1. 大多数情况下可忽略，此事件不会导致明显问题。2. 若相关应用功能异常，以管理员身份运行 dcomcnfg。3. 在\"组件服务\"中定位事件详情里的 CLSID，为其添加对应的\"本地激活\"权限。4. 不要随意修改系统组件的 DCOM 权限，以免引发其他问题。"
+    },
+    {
+      "source": "Microsoft-Windows-NDIS",
+      "event_id": 10317,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "网卡已重置",
+      "description": "网络适配器被重置。网卡出现异常被复位。",
+      "suggestion": "检查网卡驱动是否为最新版，或更换网线/接口。频繁出现可能是网卡硬件问题。"
+    },
+    {
+      "source": "Schannel",
+      "event_id": 36871,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "TLS 握手失败",
+      "description": "创建 TLS 凭据时发生致命错误。常见于较老的程序访问现代 HTTPS 服务器。",
+      "suggestion": "检查系统 TLS 设置，确认是否禁用了 TLS 1.0/1.1 后老程序无法访问。必要时为老程序兼容启用旧协议。"
+    },
+    {
+      "source": "Schannel",
+      "event_id": 36888,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "生成 TLS 警报",
+      "description": "TLS 连接生成了一条警报。TLS 协商过程中出现问题。",
+      "suggestion": "检查系统时间和证书链，或某些网络设备拦截了 HTTPS 流量。"
+    },
+    {
+      "source": "Microsoft-Windows-WLAN-AutoConfig",
+      "event_id": 4003,
+      "level": "Warning",
+      "severity": "Medium",
+      "title": "WLAN 检测到受限连接",
+      "description": "无线网络配置服务检测到网络连接受限，正在尝试自动恢复。通常意味着 Wi-Fi 连接不稳定或信号中断。",
+      "suggestion": "1. 重启路由器和电脑，排除临时性网络故障。2. 进入\"设置 > 网络和 Internet > 状态\"，运行\"网络疑难解答\"。3. 在设备管理器中更新无线网卡驱动程序。4. 若使用外置无线网卡，尝试更换 USB 接口或重新插拔。5. 检查是否因信道干扰或距离过远导致信号弱，尝试靠近路由器。"
+    },
+    {
+      "source": "Microsoft-Windows-WMI",
+      "event_id": 24,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "WMI 事件筛选器查询无效",
+      "description": "WMI 事件提供程序尝试注册一个查询，但目标类不存在，该查询将被忽略。通常是软件安装时创建的永久订阅指向了运行时才存在的类。",
+      "suggestion": "1. 若仅在软件安装时出现一次，可忽略。2. 若频繁出现，使用 CIM Studio 或 WMI 事件注册工具检查永久订阅。3. 若为第三方软件注册的无效查询，联系该软件厂商修复。"
+    },
+    {
+      "source": "Microsoft-Windows-WMI",
+      "event_id": 63,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "WMI 提供程序使用 LocalSystem 账户",
+      "description": "某个 WMI 提供程序已注册使用 LocalSystem 账户运行。这是系统对特权上下文的告知性警告，并非实际安全事件。",
+      "suggestion": "1. 通常可忽略，此事件不表示系统已被入侵。2. 若事件频繁出现且关注安全，可检查事件详情中的提供程序名称是否可预期。3. 非微软提供程序若频繁出现，联系该软件厂商确认是否有不使用 LocalSystem 的版本。"
+    },
+    {
+      "source": "Microsoft-Windows-RestartManager",
+      "event_id": 10006,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "应用程序无法关闭",
+      "description": "安装或更新程序需要关闭某个应用程序或服务，但关闭操作失败。",
+      "suggestion": "1. 手动关闭事件详情中提到的应用程序或服务。2. 若无法关闭，打开任务管理器强制结束该进程。3. 若涉及系统服务，重启系统后再次执行安装或更新。4. 若频繁出现并伴随系统异常，运行 sfc /scannow 检查系统文件。"
+    },
+    {
+      "source": "Microsoft-Windows-RestartManager",
+      "event_id": 10010,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "应用程序无法重新启动",
+      "description": "安装或更新程序关闭了某个应用程序或服务，但尝试重新启动时失败。",
+      "suggestion": "1. 手动重新启动事件详情中提到的应用程序或服务。2. 若涉及显卡相关应用，更新显卡驱动后重试。3. 运行 sfc /scannow 和 DISM /Online /Cleanup-Image /RestoreHealth 检查系统文件。4. 若持续出现，重启系统后再次执行安装或更新操作。"
+    },
+    {
+      "source": "Microsoft-Windows-AppModel-State",
+      "event_id": 23,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "应用状态修复已触发",
+      "description": "对某个应用包执行状态位置访问时出错，系统自动触发了修复流程。通常与开始菜单、任务栏等系统组件的状态数据有关。",
+      "suggestion": "1. 偶发出现可忽略，系统已自动修复。2. 若频繁出现，运行 sfc /scannow 检查系统文件完整性。3. 检查 Windows Search 索引是否正常，必要时重建索引。4. 若伴随任务栏或开始菜单异常，重启 Windows 资源管理器或重启系统。"
+    },
+    {
+      "source": "Microsoft-Windows-Winlogon",
+      "event_id": 6000,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "Winlogon 通知订阅者不可用",
+      "description": "某个 Winlogon 通知订阅者未能处理通知事件。可能由系统资源不足、注册表损坏或服务启动失败引起。",
+      "suggestion": "1. 偶发出现且系统正常可忽略。2. 检查任务管理器，确认 CPU 和内存未持续接近 100%。3. 运行 sfc /scannow 检查系统文件。4. 若频繁出现并伴随登录异常，检查相关服务是否正常运行。"
+    },
+    {
+      "source": "Microsoft-Windows-AppModel-State",
+      "event_id": 24,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "应用状态修复完成",
+      "description": "对应用包的状态位置执行修复操作已完成。若错误代码为 0，表示修复成功，通常可忽略。",
+      "suggestion": "1. 错误代码为 0 时，修复已成功，无需干预。2. 若错误代码非 0 或频繁出现，运行 sfc /scannow 检查系统文件。3. 检查相关应用包是否需要更新或重新安装。"
+    },
+    {
+      "source": "SideBySide",
+      "event_id": 78,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "组件版本冲突",
+      "description": "某个应用程序的激活上下文生成失败，所需组件版本与已激活的另一个组件版本冲突。通常与 Visual C++ 运行库或应用程序清单有关。",
+      "suggestion": "1. 确认事件详情中提到的应用程序名称。2. 安装或修复最新版 Visual C++ Redistributable（x86 和 x64 都装）。3. 若为特定应用报错，尝试重新安装该应用。4. 若应用版本较旧，检查是否有更新版本修复了清单冲突问题。"
+    },
+    {
+      "source": "Microsoft-Windows-User Profiles Service",
+      "event_id": 1534,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "用户配置文件通知失败",
+      "description": "某个组件在创建用户配置文件时的通知失败。常见于首次登录新用户或系统升级后，通常不影响正常使用。",
+      "suggestion": "1. 首次登录或系统升级后偶发，可忽略。2. 若频繁出现并伴随配置文件异常，运行 sfc /scannow 检查系统文件。3. 检查注册表中 ProfileList 下相关用户配置项是否完整。4. 若用户配置文件损坏，备份数据后重建用户配置文件。"
+    },
+    {
+      "source": "Microsoft-Windows-Search",
+      "event_id": 10024,
+      "level": "Warning",
+      "severity": "Low",
+      "title": "搜索筛选器进程无响应",
+      "description": "Windows Search 的筛选器宿主进程未响应，已被强制终止。通常与搜索索引损坏、权限问题或 PDF iFilter 等第三方筛选器冲突有关。",
+      "suggestion": "1. 偶发出现可忽略，系统会自行恢复。2. 若频繁出现，进入\"索引选项\"重建搜索索引。3. 若安装了 PDF iFilter，尝试更新或卸载后观察是否改善。4. 检查搜索索引所在磁盘是否有足够空间和正常权限。"
+    },
+    {
+      "source": "VSS",
+      "event_id": 8193,
+      "level": "Error",
+      "severity": "Medium",
+      "title": "卷影复制服务错误",
+      "description": "卷影复制服务（VSS）在调用组件时遇到意外错误。可能影响系统还原、备份和文件历史记录功能。",
+      "suggestion": "1. 运行 vssadmin list writers，检查是否有 writer 处于失败状态。2. 若有失败的 writer，尝试重启对应服务或系统。3. 运行 sfc /scannow 和 DISM 检查系统文件。4. 若与备份软件有关，更新或重新安装备份软件。"
+    },
+    {
+      "source": "Microsoft-Windows-Eventlog",
+      "event_id": 1100,
+      "level": "Information",
+      "severity": "Critical",
+      "title": "事件日志服务已关闭",
+      "description": "Windows 事件日志服务已关闭。与 1102 同等危险，攻击者可能通过关闭日志服务掩盖痕迹。需注意：正常关机或系统崩溃也可能触发此事件，应与正常关机时间对比确认是否为异常关闭。",
+      "suggestion": "1. 确认发生时间是否与正常关机一致。2. 非计划内出现时检查是否异常重启或崩溃。3. 检查是否有进程异常终止 EventLog 服务。4. 关联 6008 和 Kernel-Power 41。"
+    },
+    {
+      "source": "Microsoft-Windows-Eventlog",
+      "event_id": 1101,
+      "level": "Error",
+      "severity": "High",
+      "title": "审核事件已被传输丢弃",
+      "description": "安全审核事件因内核资源不足被传输队列丢弃。通道：Security。表示部分审核活动未被记录，可能危及系统安全审计完整性。",
+      "suggestion": "1. 检查系统资源占用，确认 CPU、内存、磁盘未持续饱和。2. 检查安全日志大小和覆盖策略，确保日志容量足够。3. 排查是否有大量异常事件产生，可能为攻击者制造日志洪水。4. 关联 1100、1102，判断是否为掩盖痕迹的组合操作。"
+    },
+    {
+      "source": "Microsoft-Windows-PowerShell",
+      "event_id": 4104,
+      "level": "Warning",
+      "severity": "High",
+      "title": "PowerShell 脚本块日志",
+      "description": "PowerShell 执行了一个脚本块，内容被记录。通道：Microsoft-Windows-PowerShell/Operational。对检测无文件攻击和恶意脚本至关重要。",
+      "suggestion": "1. 检查 ScriptBlockText 内容是否包含下载、执行、编码、混淆特征。2. 关注 -enc、-nop、-w hidden、IEX、DownloadString、FromBase64String 等关键词。3. 关注 Level 为 Warning 或 Verbose 的条目，优先排查。4. 关联 4688 和 Sysmon 1，确认脚本发起进程。"
+    }
+  ]
+}

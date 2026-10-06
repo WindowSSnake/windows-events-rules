@@ -1,0 +1,34 @@
+Events Rule Database License
+============================
+
+The file `events.json` (the "Data") are licensed under the Creative Commons
+Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
+
+Full legal text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+You are free to:
+
+  - Share — copy and redistribute the Data in any medium or format
+  - Adapt — remix, transform, and build upon the Data
+    for any purpose, even commercially.
+
+Under the following terms:
+
+  - Attribution — You must give appropriate credit, provide a link to the
+    license, and indicate if changes were made.
+  - ShareAlike — If you remix, transform, or build upon the Data, you must
+    distribute your contributions under the same license as the original.
+  - No additional restrictions — You may not apply legal terms or
+    technological measures that legally restrict others from doing anything
+    the license permits.
+
+Author's note on originality
+----------------------------
+
+The selection, organization, severity grading, and Chinese descriptions of
+the events in the Data are the original work of the author. Event identifiers
+(`source`, `event_id`) are factual information and not subject to copyright.
+Some descriptive text was drafted with AI assistance and subsequently
+reviewed and revised by the author.
+
+(c) 2026 <WindowSSnake>
